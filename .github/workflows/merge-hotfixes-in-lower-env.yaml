@@ -21,6 +21,18 @@ jobs:
       - name: Fetch all branches
         run: git fetch --all
 
+      - name: Create initial commit on QA
+        run: |
+          git checkout qa
+          git commit --allow-empty -m "Initial commit"
+          git push origin qa
+
+      - name: Create initial commit on Dev
+        run: |
+          git checkout dev
+          git commit --allow-empty -m "Initial commit"
+          git push origin dev
+
       - name: Merge to QA
         run: |
           git checkout qa
