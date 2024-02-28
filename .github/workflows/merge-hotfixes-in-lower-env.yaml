@@ -1,0 +1,34 @@
+name: Merge Hotfixes to QA and Dev
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  merge-hotfixes:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Set up Git
+        run: |
+          git config --global user.name "test-user"
+          git config --global user.email "test-user@test.com"
+
+      - name: Check out repository
+        uses: actions/checkout@v2
+
+      - name: Fetch all branches
+        run: git fetch --all
+
+      - name: Merge to QA
+        run: |
+          git checkout qa
+          git merge main --no-ff --no-edit --allow-unrelated-histories
+          git push origin qa
+
+      - name: Merge to Dev
+        run: |
+          git checkout dev
+          git merge main --no-ff --no-edit --allow-unrelated-histories
+          git push origin dev
