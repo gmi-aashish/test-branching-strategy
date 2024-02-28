@@ -24,11 +24,13 @@ jobs:
       - name: Merge to QA
         run: |
           git checkout qa
-          git merge -s ours main
+          git merge -s ours main --no-commit
+          git commit --allow-empty -m "Merge from main branch"
           git push origin qa
 
       - name: Merge to Dev
         run: |
           git checkout dev
-          git merge -s ours main
+          git merge -s ours main --no-commit
+          git commit --allow-empty -m "Merge from main branch"
           git push origin dev
