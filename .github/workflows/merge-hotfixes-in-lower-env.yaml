@@ -19,11 +19,11 @@ jobs:
       - name: Merge to QA
         run: |
           git checkout qa
-          git merge main --no-ff --no-edit
+          git merge main --no-ff --no-edit --allow-unrelated-histories
           git push origin qa
 
       - name: Merge to Dev
         run: |
           git checkout dev
-          git merge main --no-ff --no-edit
+          git merge main --no-ff --no-edit --allow-unrelated-histories
           git push origin dev
