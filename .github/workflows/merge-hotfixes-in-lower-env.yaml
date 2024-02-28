@@ -12,8 +12,8 @@ jobs:
     steps:
       - name: Set up Git
         run: |
-          git config --global user.name "test-user"
-          git config --global user.email "test-user@test.com"
+          git config --global user.name "hotfix-merge-bot"
+          git config --global user.email ""
 
       - name: Check out repository
         uses: actions/checkout@v2
@@ -24,11 +24,11 @@ jobs:
       - name: Merge to QA
         run: |
           git checkout qa
-          git merge main --no-ff --no-edit --allow-unrelated-histories
+          git merge -s ours main --no-ff --no-edit --allow-unrelated-histories
           git push origin qa
 
       - name: Merge to Dev
         run: |
           git checkout dev
-          git merge main --no-ff --no-edit --allow-unrelated-histories
+          git merge -s ours main --no-ff --no-edit --allow-unrelated-histories
           git push origin dev
