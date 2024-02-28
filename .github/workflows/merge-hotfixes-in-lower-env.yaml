@@ -1,0 +1,26 @@
+name: Merge Hotfixes to QA and Dev
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  merge-hotfixes:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+
+      - name: Merge to QA
+        run: |
+          git checkout qa
+          git merge main --no-ff --no-edit
+          git push origin qa
+
+      - name: Merge to Dev
+        run: |
+          git checkout dev
+          git merge main --no-ff --no-edit
+          git push origin dev
