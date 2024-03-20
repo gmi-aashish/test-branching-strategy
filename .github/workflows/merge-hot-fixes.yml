@@ -20,7 +20,7 @@ jobs:
           git checkout main
           git pull origin main
           git checkout -b hotfix_merge_branch
-          git merge --no-ff --no-edit hot-fix
+          git merge --no-ff --no-edit ${{ github.event.pull_request.head.ref }}
           git push origin hotfix_merge_branch
 
       - name: Merge to QA branch
