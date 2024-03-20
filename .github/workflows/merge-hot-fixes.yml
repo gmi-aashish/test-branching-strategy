@@ -16,6 +16,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
+      - name: Fetch all branches
+        run: git fetch --prune --unshallow
+
       - name: Merge main into QA
         run: |
           git checkout qa
