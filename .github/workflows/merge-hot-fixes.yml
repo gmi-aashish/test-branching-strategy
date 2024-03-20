@@ -28,12 +28,12 @@ jobs:
         run: |
           git checkout qa
           git pull origin qa
-          git merge --no-ff --no-edit main
+          git merge --no-ff --no-edit -Xtheirs main 
           git push origin qa
 
       - name: Merge main into Dev
         run: |
           git checkout dev
           git pull origin dev
-          git merge --no-ff --no-edit main
+          git merge --no-ff --no-edit -Xtheirs main
           git push origin dev
