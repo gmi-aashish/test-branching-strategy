@@ -11,10 +11,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
       - name: Check if it's a hotfix branch
         if: github.event.pull_request.merged == true && github.event.pull_request.head.ref == 'hot-fix'
         run: |
-          git fetch origin
           git checkout main
           git pull origin main
           git checkout -b hotfix_merge_branch
