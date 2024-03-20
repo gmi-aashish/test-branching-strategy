@@ -1,2 +1,2 @@
 # more changes
-print('test hotfix')
+print('test merge conflicts')
