@@ -10,31 +10,22 @@ jobs:
   merge_hotfix:
     runs-on: ubuntu-latest
 
+    if: github.event.pull_request.merged == true && github.event.pull_request.head.ref == 'hot-fix'
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Check if it's a hotfix branch
-        if: github.event.pull_request.merged == true && github.event.pull_request.head.ref == 'hot-fix'
-        run: |
-          git checkout main
-          git pull origin main
-          git checkout -b hotfix_merge_branch
-          git merge --no-ff --no-edit ${{ github.event.pull_request.head.ref }}
-          git push origin hotfix_merge_branch
-
-      - name: Merge to QA branch
-        if: github.event.pull_request.merged == true && github.event.pull_request.head.ref == 'hot-fix'
+      - name: Merge main into QA
         run: |
           git checkout qa
           git pull origin qa
-          git merge --no-ff --no-edit hotfix_merge_branch
+          git merge --no-ff --no-edit main
           git push origin qa
 
-      - name: Merge to Dev branch
-        if: github.event.pull_request.merged == true && github.event.pull_request.head.ref == 'hot-fix'
+      - name: Merge main into Dev
         run: |
           git checkout dev
           git pull origin dev
-          git merge --no-ff --no-edit hotfix_merge_branch
+          git merge --no-ff --no-edit main
           git push origin dev
