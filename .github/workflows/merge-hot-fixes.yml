@@ -1,0 +1,38 @@
+name: Merge Hotfix
+
+on:
+  pull_request:
+    branches:
+      - main
+    types: [closed]
+
+jobs:
+  merge_hotfix:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check if it's a hotfix branch
+        if: github.event.pull_request.merged == true && github.event.pull_request.head.ref == 'hot-fix'
+        run: |
+          git fetch origin
+          git checkout main
+          git pull origin main
+          git checkout -b hotfix_merge_branch
+          git merge --no-ff --no-edit hot-fix
+          git push origin hotfix_merge_branch
+
+      - name: Merge to QA branch
+        if: github.event.pull_request.merged == true && github.event.pull_request.head.ref == 'hot-fix'
+        run: |
+          git checkout qa
+          git pull origin qa
+          git merge --no-ff --no-edit hotfix_merge_branch
+          git push origin qa
+
+      - name: Merge to Dev branch
+        if: github.event.pull_request.merged == true && github.event.pull_request.head.ref == 'hot-fix'
+        run: |
+          git checkout dev
+          git pull origin dev
+          git merge --no-ff --no-edit hotfix_merge_branch
+          git push origin dev
