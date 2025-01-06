@@ -3,4 +3,8 @@ print('test merge conflicts')
 
 print('Am I in the conflict? Yes!')
 
-print("Adding a new print statement, just for check!")
+def badly_formatted_func(a,b,c) :
+    print(
+        'badly formatted function')
+
+    return a  +b +c
