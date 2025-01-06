@@ -28,7 +28,7 @@ jobs:
       - name: Get changed files
         id: changed-files
         run: |
-          git diff-tree --no-commit-id --name-only -r HEAD > changed_files.txt
+          git diff --no-commit-id --name-only -r HEAD > changed_files.txt
 
       # Run isort and black
       - name: Run isort and black
