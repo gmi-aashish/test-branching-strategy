@@ -2,3 +2,9 @@
 print('test merge conflicts')
 
 print('Am I in the conflict? Yes!')
+
+def badly_formatted_func(a,b,c) :
+    print(
+        'badly formatted function')
+
+    return a  +b +c
