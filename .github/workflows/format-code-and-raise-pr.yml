@@ -66,11 +66,11 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            const { context, github } = require('@actions/github');
+            const github = require('@actions/github');
             const branchName = 'code-format-through-bot';
             const { data: pullRequest } = await github.rest.pulls.create({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
+              owner: github.context.repo.owner,
+              repo: github.context.repo.repo,
               title: 'Code Formatting Updates',
               head: branchName,
               base: 'main',
