@@ -57,6 +57,7 @@ jobs:
       - name: Push changes
         run: |
             git checkout -b code-format-through-bot
+            git pull origin code-format-through-bot 
             git push origin code-format-through-bot
 
       # Create a PR for approval
