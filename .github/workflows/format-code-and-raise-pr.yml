@@ -56,10 +56,8 @@ jobs:
       # Push changes to a new branch
       - name: Push changes
         run: |
-          if [ -n "$(git status --porcelain)" ]; then
             git checkout -b code-format-through-bot
             git push origin code-format-through-bot
-          fi
 
       # Create a PR for approval
       - name: Create Pull Request
