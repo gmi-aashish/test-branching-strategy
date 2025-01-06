@@ -17,4 +17,3 @@ def badly_formatted_func_repeated(a,b,c) :
     return a  +b +c
 
 
-

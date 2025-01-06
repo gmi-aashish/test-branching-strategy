@@ -63,9 +63,17 @@ jobs:
 
       # Create a PR for approval
       - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v5
+        uses: actions/github-script@v6
         with:
-          branch: format-changes-$(date +%s)
-          base: main
-          title: "Code Formatting Updates"
-          body: "This PR applies isort and black formatting to the files changed in the last commit."
+          script: |
+            const { context, github } = require('@actions/github');
+            const branchName = 'code-format-through-bot';
+            const { data: pullRequest } = await github.rest.pulls.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: 'Code Formatting Updates',
+              head: branchName,
+              base: 'main',
+              body: 'This PR applies isort and black formatting to the files changed in the last commit.',
+            });
+            console.log(`Created pull request: ${pullRequest.html_url}`);
