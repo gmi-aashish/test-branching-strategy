@@ -28,14 +28,15 @@ jobs:
       - name: Get changed files
         id: changed-files
         run: |
-          git diff --no-commit-id --name-only -r HEAD > changed_files.txt
+          git show --name-only --pretty="" HEAD > changed_files.txt
+          cat changed_files.txt
 
       # Run isort and black
       - name: Run isort and black
         run: |
           if [ -s changed_files.txt ]; then
-            cat changed_files.txt | xargs isort
-            cat changed_files.txt | xargs black
+            grep '\.py$' changed_files.txt | xargs isort
+            grep '\.py$' changed_files.txt | xargs black
           else
             echo "No changed files found."
           fi
@@ -46,24 +47,35 @@ jobs:
           if [ -n "$(git status --porcelain)" ]; then
             git config user.name "github-actions[bot]"
             git config user.email "github-actions[bot]@users.noreply.github.com"
-            git add .
+            git add --all :!changed_files.txt
             git commit -m "Apply isort and black formatting"
           else
             echo "No formatting changes to commit."
           fi
 
+      # Set branch name
+      - name: Set branch name
+        id: vars
+        run: echo "BRANCH_NAME=code-format-through-bot-$(date +%s)" >> $GITHUB_ENV
+
       # Push changes to a new branch
       - name: Push changes
         run: |
-          if [ -n "$(git status --porcelain)" ]; then
-            git push origin main:format-changes-$(date +%s)
-          fi
+          git checkout -b ${{ env.BRANCH_NAME }}
+          git push origin ${{ env.BRANCH_NAME }}
 
       # Create a PR for approval
       - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v5
+        uses: actions/github-script@v6
         with:
-          branch: format-changes-$(date +%s)
-          base: main
-          title: "Code Formatting Updates"
-          body: "This PR applies isort and black formatting to the files changed in the last commit."
+          script: |
+            const branchName = process.env.BRANCH_NAME;
+            const { data: pullRequest } = await github.rest.pulls.create({
+              owner: 'gmi-aashish',
+              repo: 'test-branching-strategy',
+              title: 'Code Formatting Updates',
+              head: branchName,
+              base: 'main',
+              body: 'This PR applies isort and black formatting to the files changed in the last commit.',
+            });
+            console.log(`Created pull request: ${pullRequest.html_url}`);
