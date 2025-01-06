@@ -8,3 +8,6 @@ def badly_formatted_func(a,b,c) :
         'badly formatted function')
 
     return a  +b +c
+
+
+
