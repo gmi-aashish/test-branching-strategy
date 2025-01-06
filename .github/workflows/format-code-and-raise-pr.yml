@@ -7,7 +7,7 @@ on:
 
 jobs:
   format-and-pr:
-    if: startsWith(github.actor, 'github-actions') == false
+    if: !startsWith(github.head_ref, 'code-format-through-bot-')
     runs-on: ubuntu-latest
 
     steps:
