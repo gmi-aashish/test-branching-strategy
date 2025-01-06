@@ -7,9 +7,8 @@ on:
 
 jobs:
   format-and-pr:
+    if: "!startsWith(github.head_ref, 'code-format-through-bot-')"
     runs-on: ubuntu-latest
-
-    if: "!startsWith(github.ref, 'refs/heads/code-format-through-bot-')"
 
     steps:
       # Checkout the repository
