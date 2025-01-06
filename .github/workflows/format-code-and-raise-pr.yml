@@ -9,7 +9,7 @@ jobs:
   format-and-pr:
     runs-on: ubuntu-latest
 
-    if: "!startsWith(github.head_ref, 'code-format-through-bot-')" # Exclude bot-related branches
+    if: "!startsWith(github.ref_name, 'code-format-through-bot-')" # Exclude bot-related branches
 
     steps:
       # Checkout the repository
