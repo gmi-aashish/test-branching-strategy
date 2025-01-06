@@ -56,9 +56,8 @@ jobs:
       # Push changes to a new branch
       - name: Push changes
         run: |
-            git checkout -b code-format-through-bot
-            git pull origin code-format-through-bot 
-            git push origin code-format-through-bot
+            git checkout -b code-format-through-bot-$(date +%s)
+            git push origin code-format-through-bot-$(date +%s)
 
       # Create a PR for approval
       - name: Create Pull Request
@@ -67,7 +66,7 @@ jobs:
           script: |
             const { context, getOctokit } = require('@actions/github');
             const github = getOctokit(process.env.GITHUB_TOKEN);
-            const branchName = 'code-format-through-bot';
+            const branchName = 'code-format-through-bot-$(date +%s)';
             const { data: pullRequest } = await github.rest.pulls.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
