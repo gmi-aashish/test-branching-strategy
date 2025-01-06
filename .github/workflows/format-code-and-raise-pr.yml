@@ -9,6 +9,9 @@ jobs:
   format-and-pr:
     runs-on: ubuntu-latest
 
+    env:
+      BRANCH_NAME: code-format-through-bot-$(date +%s)
+
     steps:
       # Checkout the repository
       - name: Checkout repository
@@ -56,15 +59,15 @@ jobs:
       # Push changes to a new branch
       - name: Push changes
         run: |
-            git checkout -b code-format-through-bot-$(date +%s)
-            git push origin code-format-through-bot-$(date +%s)
+          git checkout -b $BRANCH_NAME
+          git push origin $BRANCH_NAME
 
       # Create a PR for approval
       - name: Create Pull Request
         uses: actions/github-script@v6
         with:
           script: |
-            const branchName = 'code-format-through-bot-$(date +%s)';
+            const branchName = process.env.BRANCH_NAME;
             const { data: pullRequest } = await github.rest.pulls.create({
               owner: 'gmi-aashish',
               repo: 'test-branching-strategy',
