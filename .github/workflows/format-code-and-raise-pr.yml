@@ -9,9 +9,6 @@ jobs:
   format-and-pr:
     runs-on: ubuntu-latest
 
-    env:
-      BRANCH_NAME: code-format-through-bot-$(date +%s)
-
     steps:
       # Checkout the repository
       - name: Checkout repository
@@ -56,11 +53,16 @@ jobs:
             echo "No formatting changes to commit."
           fi
 
+      # Set branch name
+      - name: Set branch name
+        id: vars
+        run: echo "BRANCH_NAME=code-format-through-bot-$(date +%s)" >> $GITHUB_ENV
+
       # Push changes to a new branch
       - name: Push changes
         run: |
-          git checkout -b $BRANCH_NAME
-          git push origin $BRANCH_NAME
+          git checkout -b ${{ env.BRANCH_NAME }}
+          git push origin ${{ env.BRANCH_NAME }}
 
       # Create a PR for approval
       - name: Create Pull Request
