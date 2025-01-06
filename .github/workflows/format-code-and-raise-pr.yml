@@ -1,0 +1,69 @@
+name: Format Code and Create PR
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  format-and-pr:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout the repository
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Install Python and dependencies
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install isort black
+
+      # Get files changed in the last commit
+      - name: Get changed files
+        id: changed-files
+        run: |
+          git diff-tree --no-commit-id --name-only -r HEAD > changed_files.txt
+
+      # Run isort and black
+      - name: Run isort and black
+        run: |
+          if [ -s changed_files.txt ]; then
+            cat changed_files.txt | xargs isort
+            cat changed_files.txt | xargs black
+          else
+            echo "No changed files found."
+          fi
+
+      # Commit changes
+      - name: Commit changes
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add .
+            git commit -m "Apply isort and black formatting"
+          else
+            echo "No formatting changes to commit."
+          fi
+
+      # Push changes to a new branch
+      - name: Push changes
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            git push origin main:format-changes-$(date +%s)
+          fi
+
+      # Create a PR for approval
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v5
+        with:
+          branch: format-changes-$(date +%s)
+          base: main
+          title: "Code Formatting Updates"
+          body: "This PR applies isort and black formatting to the files changed in the last commit."
