@@ -28,7 +28,7 @@ jobs:
       - name: Get changed files
         id: changed-files
         run: |
-          git diff --no-commit-id --name-only -r HEAD > changed_files.txt
+          git show --name-only --pretty="" HEAD > changed_files.txt
           cat changed_files.txt
 
       # Run isort and black
