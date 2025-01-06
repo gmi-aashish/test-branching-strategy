@@ -66,8 +66,8 @@ jobs:
           script: |
             const branchName = 'code-format-through-bot-$(date +%s)';
             const { data: pullRequest } = await github.rest.pulls.create({
-              owner: github.context.repo.owner,
-              repo: github.context.repo.repo,
+              owner: 'gmi-aashish',
+              repo: 'test-branching-strategy',
               title: 'Code Formatting Updates',
               head: branchName,
               base: 'main',
