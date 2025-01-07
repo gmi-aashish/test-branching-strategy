@@ -3,15 +3,16 @@ name: Format Code and Create PR
 on:
   pull_request:
     branches:
+      - dev
+      - qa
       - main
-    types: [ closed ]
+    types: [closed]
 
 jobs:
   format-and-pr:
     runs-on: ubuntu-latest
 
     if: github.event.pull_request.merged == true && !startsWith(github.event.pull_request.head.ref, 'code-format-through-bot-')
-
 
     steps:
       # Checkout the repository
@@ -68,18 +69,28 @@ jobs:
           git checkout -b ${{ env.BRANCH_NAME }}
           git push origin ${{ env.BRANCH_NAME }}
 
-      # Create a PR for approval
+      # Create Pull Request
       - name: Create Pull Request
         uses: actions/github-script@v6
         with:
           script: |
             const branchName = process.env.BRANCH_NAME;
+            const baseBranch = github.event.pull_request.base.ref;
             const { data: pullRequest } = await github.rest.pulls.create({
               owner: 'gmi-aashish',
               repo: 'test-branching-strategy',
-              title: 'Code Formatting Updates',
+              title: `Code Formatting Updates for ${baseBranch}`,
               head: branchName,
-              base: 'main',
+              base: baseBranch,
               body: 'This PR applies isort and black formatting to the files changed in the last commit.',
             });
             console.log(`Created pull request: ${pullRequest.html_url}`);
+            if (baseBranch === 'dev' || baseBranch === 'qa') {
+              await github.rest.pulls.update({
+                owner: 'gmi-aashish',
+                repo: 'test-branching-strategy',
+                pull_number: pullRequest.number,
+                state: 'closed'
+              });
+              console.log(`Closed pull request: ${pullRequest.number}`);
+            }
