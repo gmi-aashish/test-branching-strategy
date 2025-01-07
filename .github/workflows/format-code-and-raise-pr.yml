@@ -1,15 +1,18 @@
 name: Format Code and Create PR
 
 on:
-  push:
+  pull_request:
     branches:
       - main
-    paths-ignore:
-      - 'code-format-through-bot-**/**'
+    types: [ closed ]
 
 jobs:
   format-and-pr:
     runs-on: ubuntu-latest
+
+    if: github.event.pull_request.merged == true && !startsWith(github.event.pull_request.head.ref, 'code-format-through-bot-')
+
+
     steps:
       # Checkout the repository
       - name: Checkout repository
