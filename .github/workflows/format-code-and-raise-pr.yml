@@ -3,9 +3,9 @@ name: Format Code and Create PR
 on:
   pull_request:
     branches:
-      - dev
-      - qa
       - main
+      - qa
+      - dev
     types: [closed]
 
 jobs:
@@ -69,28 +69,48 @@ jobs:
           git checkout -b ${{ env.BRANCH_NAME }}
           git push origin ${{ env.BRANCH_NAME }}
 
-      # Create Pull Request
-      - name: Create Pull Request
+      # Create PRs for main, qa, and dev
+      - name: Create Pull Requests
         uses: actions/github-script@v6
         with:
           script: |
             const branchName = process.env.BRANCH_NAME;
-            const baseBranch = github.event.pull_request.base.ref;
-            const { data: pullRequest } = await github.rest.pulls.create({
-              owner: 'gmi-aashish',
-              repo: 'test-branching-strategy',
-              title: `Code Formatting Updates for ${baseBranch}`,
-              head: branchName,
-              base: baseBranch,
-              body: 'This PR applies isort and black formatting to the files changed in the last commit.',
-            });
-            console.log(`Created pull request: ${pullRequest.html_url}`);
-            if (baseBranch === 'dev' || baseBranch === 'qa') {
-              await github.rest.pulls.update({
+            const branches = ['main', 'qa', 'dev'];
+            for (const base of branches) {
+              const { data: pullRequest } = await github.rest.pulls.create({
                 owner: 'gmi-aashish',
                 repo: 'test-branching-strategy',
-                pull_number: pullRequest.number,
-                state: 'closed'
+                title: `Code Formatting Updates for ${base}`,
+                head: branchName,
+                base: base,
+                body: 'This PR applies isort and black formatting to the files changed in the last commit.',
               });
-              console.log(`Closed pull request: ${pullRequest.number}`);
+              console.log(`Created pull request for ${base}: ${pullRequest.html_url}`);
+            }
+
+      # Close PRs for qa and dev
+      - name: Close PRs for qa and dev
+        if: always()
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const branchName = process.env.BRANCH_NAME;
+            const branches = ['qa', 'dev'];
+            for (const base of branches) {
+              const { data: pullRequests } = await github.rest.pulls.list({
+                owner: 'gmi-aashish',
+                repo: 'test-branching-strategy',
+                head: `gmi-aashish:${branchName}`,
+                base: base,
+                state: 'open',
+              });
+              for (const pr of pullRequests) {
+                await github.rest.pulls.update({
+                  owner: 'gmi-aashish',
+                  repo: 'test-branching-strategy',
+                  pull_number: pr.number,
+                  state: 'closed',
+                });
+                console.log(`Closed pull request for ${base}: ${pr.html_url}`);
+              }
             }
