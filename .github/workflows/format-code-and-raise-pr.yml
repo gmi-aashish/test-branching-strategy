@@ -88,8 +88,8 @@ jobs:
               console.log(`Created pull request for ${base}: ${pullRequest.html_url}`);
             }
 
-      # Close PRs for qa and dev
-      - name: Close PRs for qa and dev
+      # Merge PRs for qa and dev
+      - name: Merge PRs for qa and dev
         if: always()
         uses: actions/github-script@v6
         with:
@@ -105,12 +105,11 @@ jobs:
                 state: 'open',
               });
               for (const pr of pullRequests) {
-                await github.rest.pulls.update({
+                await github.rest.pulls.merge({
                   owner: 'gmi-aashish',
                   repo: 'test-branching-strategy',
                   pull_number: pr.number,
-                  state: 'closed',
                 });
-                console.log(`Closed pull request for ${base}: ${pr.html_url}`);
+                console.log(`Merged pull request for ${base}: ${pr.html_url}`);
               }
             }
