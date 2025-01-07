@@ -4,13 +4,12 @@ on:
   push:
     branches:
       - main
+    paths-ignore:
+      - 'code-format-through-bot-**/**'
 
 jobs:
   format-and-pr:
     runs-on: ubuntu-latest
-
-    if: "!startsWith(github.ref_name, 'code-format-through-bot-')" # Exclude bot-related branches
-
     steps:
       # Checkout the repository
       - name: Checkout repository
