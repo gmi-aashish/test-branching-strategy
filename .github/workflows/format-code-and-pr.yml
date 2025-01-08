@@ -1,0 +1,115 @@
+name: Format Code, Create PR and Merge PRs for QA and Dev
+
+on:
+  pull_request:
+    branches:
+      - main
+      - qa
+      - dev
+    types: [closed]
+
+jobs:
+  format-and-pr:
+    runs-on: ubuntu-latest
+
+    if: github.event.pull_request.merged == true && !startsWith(github.event.pull_request.head.ref, 'code-format-through-bot-')
+
+    steps:
+      # Checkout the repository
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Install Python and dependencies
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install isort black
+
+      # Get files changed in the last commit
+      - name: Get changed files
+        id: changed-files
+        run: |
+          git show --name-only --pretty="" HEAD > changed_files.txt
+          cat changed_files.txt
+
+      # Run isort and black
+      - name: Run isort and black
+        run: |
+          if [ -s changed_files.txt ]; then
+            grep '\.py$' changed_files.txt | xargs isort
+            grep '\.py$' changed_files.txt | xargs black
+          else
+            echo "No changed files found."
+          fi
+
+      # Commit changes
+      - name: Commit changes
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            git config user.name "github-actions[codeql-bot]"
+            git config user.email "github-actions[codeql-bot]@users.noreply.github.com"
+            git add --all :!changed_files.txt
+            git commit -m "Apply isort and black formatting"
+          else
+            echo "No formatting changes to commit."
+          fi
+
+      # Set branch name
+      - name: Set branch name
+        id: vars
+        run: echo "BRANCH_NAME=code-format-through-bot-$(date +%s)" >> $GITHUB_ENV
+
+      # Push changes to a new branch
+      - name: Push changes
+        run: |
+          git checkout -b ${{ env.BRANCH_NAME }}
+          git push origin ${{ env.BRANCH_NAME }}
+
+      # Create PRs for main, qa, and dev
+      - name: Create Pull Requests
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const branchName = process.env.BRANCH_NAME;
+            const branches = ['main', 'qa', 'dev'];
+            for (const base of branches) {
+              const { data: pullRequest } = await github.rest.pulls.create({
+                owner: 'gmi-aashish',
+                repo: 'test-branching-strategy',
+                title: `Code Formatting Updates for ${base}`,
+                head: branchName,
+                base: base,
+                body: 'This PR applies isort and black formatting to the files changed in the last commit.',
+              });
+              console.log(`Created pull request for ${base}: ${pullRequest.html_url}`);
+            }
+
+      # Merge PRs for qa and dev
+      - name: Merge PRs for qa and dev
+        if: always()
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const branchName = process.env.BRANCH_NAME;
+            const branches = ['qa', 'dev'];
+            for (const base of branches) {
+              const { data: pullRequests } = await github.rest.pulls.list({
+                owner: 'gmi-aashish',
+                repo: 'test-branching-strategy',
+                head: `gmi-aashish:${branchName}`,
+                base: base,
+                state: 'open',
+              });
+              for (const pr of pullRequests) {
+                await github.rest.pulls.merge({
+                  owner: 'gmi-aashish',
+                  repo: 'test-branching-strategy',
+                  pull_number: pr.number,
+                });
+                console.log(`Merged pull request for ${base}: ${pr.html_url}`);
+              }
+            }
