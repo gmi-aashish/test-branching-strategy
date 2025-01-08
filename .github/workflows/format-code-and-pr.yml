@@ -46,14 +46,13 @@ jobs:
             git config user.email "github-actions[codeql-bot]@users.noreply.github.com"
             git add --all --force :!changed_files.txt
             git commit -m "Apply isort and black formatting"
-            echo "::set-output name=found_formatting_changes::true"
+            echo "found_formatting_changes=true" >> $GITHUB_ENV
           else
-            echo "No formatting changes to commit."
-            echo "::set-output name=found_formatting_changes::false"
+            echo "found_formatting_changes=false" >> $GITHUB_ENV
           fi
 
       - name: Upload changes
-        if: steps.commit-changes.outputs.found_formatting_changes == 'true'
+        if: env.found_formatting_changes == 'true'
         uses: actions/upload-artifact@v3
         with:
           name: formatted-code
@@ -62,7 +61,7 @@ jobs:
   raise-and-merge-pr:
     runs-on: ubuntu-latest
     needs: format-code
-    if: needs.format-code.outputs.found_formatting_changes == 'true'
+    if: env.found_formatting_changes == 'true'
 
     steps:
       - name: Checkout repository
