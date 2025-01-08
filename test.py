@@ -5,5 +5,3 @@ def  greet(name):
     else :print(   "Nice to meet you, "+name+"!")
 
 
-
-

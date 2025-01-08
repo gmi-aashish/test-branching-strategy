@@ -50,6 +50,7 @@ jobs:
           else
             echo "No formatting changes to commit."
             echo "::set-output name=found_formatting_changes::false"
+          fi
 
       - name: Upload changes
         if: steps.commit-changes.outputs.found_formatting_changes == 'true'
