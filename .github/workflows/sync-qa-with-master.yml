@@ -10,13 +10,13 @@ jobs:
   merge_hotfix:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
       - name: Set up Git
         run: |
           git config user.name "github-actions[master-qa-sync-bot]"
           git config user.email "github-actions[master-qa-sync-bot]@users.noreply.github.com"
-
-      - name: Checkout repository
-        uses: actions/checkout@v2
 
       - name: Fetch all branches
         run: git fetch --prune --unshallow
@@ -25,5 +25,5 @@ jobs:
         run: |
           git checkout qa
           git pull origin qa
-          git merge --no-ff --no-edit -Xtheirs main 
+          git merge --no-ff --no-edit -Xtheirs main
           git push origin qa
