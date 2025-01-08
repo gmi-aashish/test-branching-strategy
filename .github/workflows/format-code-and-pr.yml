@@ -57,6 +57,7 @@ jobs:
             git commit -m "Apply isort and black formatting"
           else
             echo "No formatting changes to commit."
+            exit 0
           fi
 
       # Set branch name
