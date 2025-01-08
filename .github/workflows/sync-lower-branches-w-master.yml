@@ -1,4 +1,4 @@
-name: Sync QA with Master
+name: sync lower branches with master
 
 on:
   pull_request:
@@ -7,7 +7,7 @@ on:
     types: [closed]
 
 jobs:
-  sync-qa-with-master:
+  sync-with-master:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -15,8 +15,8 @@ jobs:
 
       - name: Set up Git
         run: |
-          git config user.name "gh-ac[master-qa-sync-bot]"
-          git config user.email "gh-ac[master-qa-sync-bot]@users.noreply.github.com"
+          git config user.name "gh-ac[sync-w-master-bot]"
+          git config user.email "gh-ac[sync-w-master-bot]@users.noreply.github.com"
 
       - name: Fetch all branches
         run: git fetch --prune --unshallow
@@ -27,3 +27,10 @@ jobs:
           git pull origin qa
           git merge --no-ff --no-edit -Xtheirs main # Merge main into QA, with the main branch changes taking precedence
           git push origin qa
+
+      - name: Merge main into Dev
+        run: |
+          git checkout dev
+          git pull origin dev
+          git merge --no-ff --no-edit -Xtheirs main # Merge main into Dev, with the main branch changes taking precedence
+          git push origin dev
