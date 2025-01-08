@@ -51,7 +51,7 @@ jobs:
           if [ -n "$(git status --porcelain)" ]; then
             git config user.name "github-actions[codeql-bot]"
             git config user.email "github-actions[codeql-bot]@users.noreply.github.com"
-            git add --all :!changed_files.txt
+            git add --all --force :!changed_files.txt
             git commit -m "Apply isort and black formatting"
             echo "found_formatting_changes=true" >> $GITHUB_ENV
           else
