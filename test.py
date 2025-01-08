@@ -9,3 +9,6 @@ def greet(name):
         print("Hey Bob! How's it going?")
     else:
         print("Nice to meet you, " + name + "!")
+
+
+greet("heyAlice!!")
