@@ -33,7 +33,7 @@ jobs:
       - name: Get changed files
         id: changed-files
         run: |
-          git show --name-only --pretty="" HEAD | grep '\.py$' > changed_py_files.txt
+          git show --name-only --pretty="" HEAD | grep '\.py$' > changed_files.txt
           cat changed_files.txt
 
       # Run isort and black
