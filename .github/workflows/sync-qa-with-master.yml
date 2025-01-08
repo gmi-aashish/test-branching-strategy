@@ -7,7 +7,7 @@ on:
     types: [closed]
 
 jobs:
-  merge_hotfix:
+  sync-qa-with-master:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
