@@ -66,5 +66,4 @@ jobs:
       - name: Push changes
         if: env.found_formatting_changes == 'true'
         run: |
-          git checkout -b ${{ env.BRANCH_NAME }}
           git push origin ${{ env.BRANCH_NAME }}
