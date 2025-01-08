@@ -25,5 +25,5 @@ jobs:
         run: |
           git checkout qa
           git pull origin qa
-          git merge --no-ff --no-edit -Xtheirs main
+          git merge --no-ff --no-edit -Xtheirs main # Merge main into QA, with the main branch changes taking precedence
           git push origin qa
