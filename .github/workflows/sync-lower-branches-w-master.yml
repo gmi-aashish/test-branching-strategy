@@ -9,6 +9,9 @@ on:
 jobs:
   sync-with-master:
     runs-on: ubuntu-latest
+
+    if: github.event.pull_request.merged == true && !startsWith(github.event.pull_request.head.ref, 'code-format-through-bot-')
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
