@@ -8,6 +8,9 @@ on:
       - dev
     types: [closed]
 
+env:
+  found_formatting_changes: false
+
 jobs:
   format-code:
     runs-on: ubuntu-latest
