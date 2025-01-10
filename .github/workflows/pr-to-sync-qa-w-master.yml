@@ -1,4 +1,4 @@
-name: sync qa with master
+name: raise pull request to sync qa with master
 
 on:
   pull_request:
@@ -30,7 +30,7 @@ jobs:
           git pull origin main
           git push origin sync-qa-w-master
         
-      - name: Create PR to merge main into QA
+      - name: Raise PR to merge main into QA
         uses: actions/github-script@v6
         with:
           script: |
@@ -40,6 +40,6 @@ jobs:
               title: 'Merge main into QA',
               head: 'sync-qa-w-master',
               base: 'qa',
-              body: 'This PR merges changes from main into QA.',
+              body: 'This is a [bot] PR to merge changes in main into QA.',
             });
             console.log(`Created pull request: ${pullRequest.html_url}`);
