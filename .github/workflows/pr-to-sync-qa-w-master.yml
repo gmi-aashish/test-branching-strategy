@@ -53,5 +53,5 @@ jobs:
               });
               console.log(`Created pull request: ${pullRequest.html_url}`);
             } else {
-              console.log('A pull request already exists.');
+              console.log('A pull request already exists. New commit will be added to it.');
             }
