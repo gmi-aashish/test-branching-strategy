@@ -1,4 +1,4 @@
-name: raise pull request to sync qa with master
+name: raise pull request to sync 'qa' with 'main'
 
 on:
   pull_request:
@@ -13,33 +13,45 @@ jobs:
     if: github.event.pull_request.merged == true
 
     steps:
-      - name: Checkout repository
+      - name: checkout repository
         uses: actions/checkout@v2
 
-      - name: Set up Git
+      - name: set up Git
         run: |
           git config user.name "gh-ac[sync-w-master-bot]"
           git config user.email "gh-ac[sync-w-master-bot]@users.noreply.github.com"
 
-      - name: Fetch all branches
+      - name: fetch all branches
         run: git fetch --prune --unshallow
 
-      - name: Get latest of main in syncing branch
+      - name: get latest of 'main' in 'sync-qa-w-master'
         run: |
           git checkout -b sync-qa-w-master
           git pull origin main
           git push origin sync-qa-w-master
-        
-      - name: Raise PR to merge main into QA
+
+      - name: raise PR to merge 'main' into 'qa'
         uses: actions/github-script@v6
         with:
           script: |
-            const { data: pullRequest } = await github.rest.pulls.create({
-              owner: 'gmi-aashish',
-              repo: 'test-branching-strategy',
-              title: 'Merge main into QA',
+            const { data: pullRequests } = await github.rest.pulls.list({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
               head: 'sync-qa-w-master',
               base: 'qa',
-              body: 'This is a [bot] PR to merge changes in main into QA.',
+              state: 'open'
             });
-            console.log(`Created pull request: ${pullRequest.html_url}`);
+            
+            if (pullRequests.length === 0) {
+              const { data: pullRequest } = await github.rest.pulls.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: 'merge [master] into [qa]',
+                head: 'sync-qa-w-master',
+                base: 'qa',
+                body: 'This is a [bot] PR to merge changes in [master] into [qa].',
+              });
+              console.log(`Created pull request: ${pullRequest.html_url}`);
+            } else {
+              console.log('A pull request already exists.');
+            }
