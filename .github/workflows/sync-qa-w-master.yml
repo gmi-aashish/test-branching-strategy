@@ -1,0 +1,45 @@
+name: sync qa with master
+
+on:
+  pull_request:
+    branches:
+      - main
+    types: [closed]
+
+jobs:
+  sync-qa-with-master:
+    runs-on: ubuntu-latest
+
+    if: github.event.pull_request.merged == true
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Git
+        run: |
+          git config user.name "gh-ac[sync-w-master-bot]"
+          git config user.email "gh-ac[sync-w-master-bot]@users.noreply.github.com"
+
+      - name: Fetch all branches
+        run: git fetch --prune --unshallow
+
+      - name: Get latest of main in syncing branch
+        run: |
+          git checkout -b sync-qa-w-master
+          git pull origin main
+          git push origin sync-qa-w-master
+        
+      - name: Create PR to merge main into QA
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const { data: pullRequest } = await github.rest.pulls.create({
+              owner: 'gmi-aashish',
+              repo: 'test-branching-strategy',
+              title: 'Merge main into QA',
+              head: 'sync-qa-w-master',
+              base: 'qa',
+              body: 'This PR merges changes from main into QA.',
+            });
+            console.log(`Created pull request: ${pullRequest.html_url}`);
