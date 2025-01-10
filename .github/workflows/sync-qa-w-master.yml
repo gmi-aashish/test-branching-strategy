@@ -24,9 +24,22 @@ jobs:
       - name: Fetch all branches
         run: git fetch --prune --unshallow
 
-      - name: Checkout to syncing branch from main and Pull latest changes in main, and create PR to merge into QA
+      - name: Get latest of main in syncing branch
         run: |
           git checkout -b sync-qa-w-master
           git pull origin main
           git push origin sync-qa-w-master
-          gh pr create --base qa --head sync-qa-w-master --title "Sync QA with Main" --body "This PR is to sync QA with Main"
+        
+      - name: Create PR to merge main into QA
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const { data: pullRequest } = await github.rest.pulls.create({
+              owner: 'gmi-aashish',
+              repo: 'test-branching-strategy',
+              title: 'Merge main into QA',
+              head: 'sync-qa-w-master',
+              base: 'qa',
+              body: 'This PR merges changes from main into QA.',
+            });
+            console.log(`Created pull request: ${pullRequest.html_url}`);
