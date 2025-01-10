@@ -1,0 +1,32 @@
+name: sync qa with master
+
+on:
+  pull_request:
+    branches:
+      - main
+    types: [closed]
+
+jobs:
+  sync-qa-with-master:
+    runs-on: ubuntu-latest
+
+    if: github.event.pull_request.merged == true
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Git
+        run: |
+          git config user.name "gh-ac[sync-w-master-bot]"
+          git config user.email "gh-ac[sync-w-master-bot]@users.noreply.github.com"
+
+      - name: Fetch all branches
+        run: git fetch --prune --unshallow
+
+      - name: Checkout to syncing branch from main and Pull latest changes in main, and create PR to merge into QA
+        run: |
+          git checkout -b sync-qa-w-master
+          git pull origin main
+          git push origin sync-qa-w-master
+          gh pr create --base qa --head sync-qa-w-master --title "Sync QA with Main" --body "This PR is to sync QA with Main"
