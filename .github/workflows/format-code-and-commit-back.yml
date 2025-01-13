@@ -1,4 +1,4 @@
-name: Format Code and Commit back to feature branch
+name: format code and commit back to feature branch
 
 on:
   push:
