@@ -7,7 +7,7 @@ on:
     types: [closed]
 
 jobs:
-  sync-qa-with-master:
+  sync-qa-with-main:
     runs-on: ubuntu-latest
 
     if: github.event.pull_request.merged == true
@@ -26,9 +26,9 @@ jobs:
 
       - name: get latest of 'main' in 'sync-qa-w-master'
         run: |
-          git checkout -b sync-qa-w-master
+          git checkout -b sync-qa-w-main
           git pull origin main
-          git push origin sync-qa-w-master
+          git push origin sync-qa-w-main
 
       - name: raise PR to merge 'main' into 'qa'
         uses: actions/github-script@v6
@@ -37,7 +37,7 @@ jobs:
             const { data: pullRequests } = await github.rest.pulls.list({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              head: 'sync-qa-w-master',
+              head: 'sync-qa-w-main',
               base: 'qa',
               state: 'open'
             });
@@ -46,10 +46,10 @@ jobs:
               const { data: pullRequest } = await github.rest.pulls.create({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                title: 'merge [master] into [qa]',
-                head: 'sync-qa-w-master',
+                title: 'pull request by gh-ac[sync-w-main-bot] - merge [main] into [qa]',
+                head: 'sync-qa-w-main',
                 base: 'qa',
-                body: 'This is a [bot] PR to merge changes in [master] into [qa].',
+                body: 'This is a [bot] PR to merge changes in [main] into [qa].',
               });
               console.log(`Created pull request: ${pullRequest.html_url}`);
             } else {
