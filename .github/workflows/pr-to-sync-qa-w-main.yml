@@ -62,6 +62,7 @@ jobs:
                 pull_number: pullRequest.number,
                 merge_method: 'merge'
               });
+            console.log('Merged pull request successfully: ${pullRequest.html_url}');
             } else {
               // add a new commit to the existing pull request
               console.log('A pull request already exists. New commit will be added to it.');
