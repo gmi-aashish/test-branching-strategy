@@ -34,6 +34,7 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
+            // collect all open pull requests
             const { data: pullRequests } = await github.rest.pulls.list({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -42,6 +43,7 @@ jobs:
               state: 'open'
             });
             
+            // create pull request if not exists
             if (pullRequests.length === 0) {
               const { data: pullRequest } = await github.rest.pulls.create({
                 owner: context.repo.owner,
@@ -52,6 +54,15 @@ jobs:
                 body: 'This is a [bot] PR to merge changes in [main] into [qa].',
               });
               console.log(`Created pull request: ${pullRequest.html_url}`);
+              
+              // merge the pull request automatically (with failure if not possible)
+              await github.rest.pulls.merge({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: pullRequest.number,
+                merge_method: 'merge'
+              });
             } else {
+              // add a new commit to the existing pull request
               console.log('A pull request already exists. New commit will be added to it.');
             }
